@@ -4,3 +4,5 @@ terraform validate
 terraform plan
 terraform apply  -auto-approve
 terraform destroy  -auto-approve
+chmod 400 tfkey
+ssh -i "tfkey" ec2-user@ec2-54-82-45-235.compute-1.amazonaws.com
