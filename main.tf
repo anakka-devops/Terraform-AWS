@@ -1,13 +1,38 @@
 resource "aws_instance" "web" {
   ami             = "ami-0dbc3d7bc646e8516" #Amazon Linux AMI
   instance_type   = "t2.micro"
-  count           = 2                               # to spin multiple instances
-  security_groups = [aws_security_group.TF_SG.name] #added below security group to bind with this instance
+  security_groups = [aws_security_group.TF_SG.name]
+
+  #To spin multiple instances
+  #count           = 2
+
+  #Key Pair: First method if we create key pair on AWS and can call it from here
+  #key_name="demo" 
+  # ssh ec2-user@18.236.224.178 -i demo.pem 
+  # chmod 400 demo.pem #if we get any permisssion issue
 
   tags = {
     Name = "Terraform Ec2"
   }
 }
+
+#second method if we create key pair in this file
+resource "aws_key_pair" "TF_key" {
+  key_name   = "TF_key"
+  public_key = tls_private_key.rsa.public_key_openssh
+}
+# RSA key of size 4096 bits
+resource "tls_private_key" "rsa" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+#create local folder for pem file
+resource "local_file" "TF_key" {
+  content  = tls_private_key.rsa.private_key_pem
+  filename = "tfkey"
+}
+# once we have tfkey use ssh: ssh ec2-user@18.212.210.55 -i tfkey
+# chmod 400 tfkey #if we get any permisssion issue
 
 #securitygroup using Terraform
 
